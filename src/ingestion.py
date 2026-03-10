@@ -1,24 +1,27 @@
-import pandas as pd
-from influxdb_client import InfluxDBClient
-from src.logger_setup import Log
 import os
+import pandas as pd
 from dotenv import load_dotenv
+from influxdb_client import InfluxDBClient
 
-# Load .env file
+from src.config import INFLUX_URL, INFLUX_TOKEN, INFLUX_ORG, INFLUX_BUCKET
+from src.logger_setup import Log
+
 load_dotenv()
+
 
 class Ingestion:
     def __init__(self):
         """
         Initializes the Ingestion class with InfluxDB details and sets up logging.
+        Uses DOCKER_INFLUXDB_INIT_* when in Docker, else INFLUX_* / config defaults.
         """
         try:
             self.logger = Log.setup_logging()
 
-            self.url = "http://localhost:8086"
-            self.token = os.getenv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN")
-            self.org = os.getenv("DOCKER_INFLUXDB_INIT_ORG")
-            self.bucket = os.getenv("DOCKER_INFLUXDB_INIT_BUCKET")
+            self.url = os.getenv("INFLUX_URL", INFLUX_URL)
+            self.token = os.getenv("DOCKER_INFLUXDB_INIT_ADMIN_TOKEN") or os.getenv("INFLUX_TOKEN", INFLUX_TOKEN)
+            self.org = os.getenv("DOCKER_INFLUXDB_INIT_ORG") or os.getenv("INFLUX_ORG", INFLUX_ORG)
+            self.bucket = os.getenv("DOCKER_INFLUXDB_INIT_BUCKET") or os.getenv("INFLUX_BUCKET", INFLUX_BUCKET)
             self.client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
 
             self.logger.info("Ingestion class initialized successfully", stacklevel=2)

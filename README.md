@@ -58,8 +58,10 @@ Once running, visit these URLs:
 
 | 🎯 **Main Dashboard** | 📈 **Monitoring** | 🔬 **ML Tracking** |
 |:---:|:---:|:---:|
-| [Streamlit UI](http://localhost:8501) | [Grafana](http://localhost:3000) | [MLflow](http://localhost:5000) |
+| [Streamlit UI](http://localhost:8501) | [Grafana](http://localhost:3000) | [MLflow](http://localhost:5050) |
 | Interactive Forecasts | Real-time Metrics | Experiment Tracking |
+
+**Full-stack (React + Express)** – Run `npm run dev` for React + Express, or start the `web` service with Docker (`docker-compose up -d web`). App: [http://localhost:5000](http://localhost:5000). See **[ARCHITECTURE.md](ARCHITECTURE.md)** for how all services and config are linked.
 
 > 📖 **For detailed setup instructions, see [SETUP.md](SETUP.md)**
 

@@ -119,7 +119,27 @@ services:
       --port 5000
 
   # -------------------------------
-  # Streamlit (Main Website)
+  # Web app (Express + React, full-stack)
+  # -------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: pulse-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      PROM_URL: http://prometheus:9090/api/v1/query
+    volumes:
+      - ./models:/app/models:ro
+    depends_on:
+      - prometheus
+
+  # -------------------------------
+  # Streamlit (Alternative UI – same stack)
   # -------------------------------
   streamlit:
     build:

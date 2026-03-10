@@ -3,14 +3,13 @@ import requests
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 
-# ---------------------------
-# Configuration
-# ---------------------------
-PROMETHEUS_URL = "http://localhost:9090"
-INFLUX_URL = "http://localhost:8086"
-INFLUX_TOKEN = "pulse-ai-secure-token"
-ORG = "pulse-ai"
-BUCKET = "metrics"
+from src.config import (
+    PROMETHEUS_URL,
+    INFLUX_URL,
+    INFLUX_TOKEN,
+    INFLUX_ORG,
+    INFLUX_BUCKET,
+)
 
 # ---------------------------
 # InfluxDB Client
@@ -18,7 +17,7 @@ BUCKET = "metrics"
 client = InfluxDBClient(
     url=INFLUX_URL,
     token=INFLUX_TOKEN,
-    org=ORG
+    org=INFLUX_ORG,
 )
 
 write_api = client.write_api(write_options=SYNCHRONOUS)
@@ -64,7 +63,7 @@ while True:
                 .field("ram_usage", ram)
             )
 
-            write_api.write(bucket=BUCKET, record=point)
+            write_api.write(bucket=INFLUX_BUCKET, record=point)
 
             print(f"✅ Stored → CPU: {cpu:.2f}% | RAM: {ram:.2f}%")
 

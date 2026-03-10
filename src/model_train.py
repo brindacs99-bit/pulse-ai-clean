@@ -4,13 +4,15 @@ import joblib
 from influxdb_client import InfluxDBClient
 from sklearn.linear_model import LinearRegression
 
-# ----------------------------
-# InfluxDB Configuration
-# ----------------------------
-INFLUX_URL = "http://localhost:8086"
-INFLUX_TOKEN = "pulse-ai-secure-token"
-ORG = "pulse-ai"
-BUCKET = "metrics"
+from src.config import (
+    INFLUX_URL,
+    INFLUX_TOKEN,
+    INFLUX_ORG,
+    INFLUX_BUCKET,
+    MODELS_DIR,
+    CPU_MODEL_PATH,
+    RAM_MODEL_PATH,
+)
 
 # ----------------------------
 # Connect to InfluxDB
@@ -18,7 +20,7 @@ BUCKET = "metrics"
 client = InfluxDBClient(
     url=INFLUX_URL,
     token=INFLUX_TOKEN,
-    org=ORG
+    org=INFLUX_ORG,
 )
 
 query_api = client.query_api()
@@ -27,7 +29,7 @@ query_api = client.query_api()
 # Fetch last 10 minutes data
 # ----------------------------
 query = f'''
-from(bucket: "{BUCKET}")
+from(bucket: "{INFLUX_BUCKET}")
   |> range(start: -10m)
   |> filter(fn: (r) => r._measurement == "system_metrics")
   |> filter(fn: (r) => r._field == "cpu_usage" or r._field == "ram_usage")
@@ -73,7 +75,8 @@ ram_model.fit(X, y_ram)
 # ----------------------------
 # Save Models
 # ----------------------------
-joblib.dump(cpu_model, "models/cpu_model.pkl")
-joblib.dump(ram_model, "models/ram_model.pkl")
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+joblib.dump(cpu_model, str(CPU_MODEL_PATH))
+joblib.dump(ram_model, str(RAM_MODEL_PATH))
 
 print("✅ AI models trained and saved successfully")

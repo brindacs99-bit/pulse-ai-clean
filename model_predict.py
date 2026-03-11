@@ -46,11 +46,11 @@ def fetch_recent_metrics():
 
     if isinstance(tables, list):
         df = pd.concat(tables)
-
     else:
         df = tables
 
     return df
+
 
 # ----------------------------
 # Prediction function
@@ -69,7 +69,7 @@ def predict_future(steps=10):
 
     except:
 
-        # fallback if DB not ready
+        # fallback if database not ready
         cpu_history = np.random.normal(30, 5, steps)
         ram_history = np.random.normal(40, 5, steps)
 

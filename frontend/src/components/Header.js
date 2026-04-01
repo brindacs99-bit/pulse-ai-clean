@@ -5,21 +5,40 @@ function Header() {
 
   const navigate = useNavigate();
 
+  const isLoggedIn = localStorage.getItem("auth");
+  const user = localStorage.getItem("user");
+  const server = localStorage.getItem("server"); // ✅ get server
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   return (
 
     <nav className="navbar">
 
-      <div className="logo-section" onClick={() => navigate("/")}>
+      {/* LOGO */}
+      <div
+        className="logo-section"
+        onClick={() => isLoggedIn
+          ? navigate(`/dashboard?page=home`)
+          : navigate("/")
+        }
+      >
         <img src="/logo.png" alt="Pulse AI Logo" className="logo"/>
         <h2>Pulse.ai</h2>
       </div>
 
+      {/* NAVIGATION */}
       <div className="nav-links">
 
-        <button onClick={() => navigate("/")}>
-          Features
+        {/* ✅ HOME */}
+        <button onClick={() => navigate("/dashboard?page=home")}>
+          Home
         </button>
 
+        {/* ✅ ALL ROUTES FIXED */}
         <button onClick={() => navigate("/dashboard?page=monitoring")}>
           Monitoring
         </button>
@@ -36,9 +55,16 @@ function Header() {
           About
         </button>
 
-        <button onClick={() => navigate("/login")}>
-          Login
-        </button>
+        {/* ✅ LOGIN / LOGOUT */}
+        {isLoggedIn ? (
+          <button onClick={handleLogout}>
+            Logout ({user})
+          </button>
+        ) : (
+          <button onClick={() => navigate("/login")}>
+            Login
+          </button>
+        )}
 
       </div>
 

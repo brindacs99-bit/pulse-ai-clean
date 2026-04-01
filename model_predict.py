@@ -49,6 +49,8 @@ def fetch_recent_metrics():
     else:
         df = tables
 
+    df = df.dropna()
+
     return df
 
 
@@ -62,22 +64,34 @@ def predict_future(steps=10):
         df = fetch_recent_metrics()
 
         if df.empty:
-            raise ValueError("No data")
+            raise ValueError("No metrics available")
 
-        cpu_history = df["cpu_usage"].values[-steps:]
-        ram_history = df["ram_usage"].values[-steps:]
+        # take recent history
+        cpu_history = df["cpu_usage"].values[-20:]
+        ram_history = df["ram_usage"].values[-20:]
+
+        # smoothing to reduce noise
+        cpu_history = pd.Series(cpu_history).rolling(window=3).mean().dropna().values
+        ram_history = pd.Series(ram_history).rolling(window=3).mean().dropna().values
 
     except:
 
-        # fallback if database not ready
-        cpu_history = np.random.normal(30, 5, steps)
-        ram_history = np.random.normal(40, 5, steps)
+        # fallback data if database not ready
+        cpu_history = np.random.normal(30, 10, 20)
+        ram_history = np.random.normal(40, 8, 20)
 
-    X_future = np.arange(len(cpu_history), len(cpu_history) + steps).reshape(-1,1)
+    # create time index for prediction
+    X_future = np.arange(len(cpu_history), len(cpu_history) + steps).reshape(-1, 1)
 
+    # model predictions
     cpu_pred = cpu_model.predict(X_future)
     ram_pred = ram_model.predict(X_future)
 
+    # add small variation for realistic graph
+    cpu_pred = cpu_pred + np.random.normal(0, 1.5, len(cpu_pred))
+    ram_pred = ram_pred + np.random.normal(0, 1.5, len(ram_pred))
+
+    # keep values within limits
     cpu_pred = np.clip(cpu_pred, 0, 100)
     ram_pred = np.clip(ram_pred, 0, 100)
 

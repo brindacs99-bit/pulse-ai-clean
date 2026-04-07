@@ -69,8 +69,6 @@ def get_cpu_usage():
         return float(result[0]["value"][1])
 
     return 0
-
-
 # -----------------------------
 # RAM USAGE (FIXED)
 # -----------------------------
@@ -180,7 +178,6 @@ if page == "home":
     col1.metric("CPU Usage", f"{cpu:.2f}%")
     col2.metric("RAM Usage", f"{ram:.2f}%")
 
-
 # -----------------------------
 # MONITORING
 # -----------------------------
@@ -188,13 +185,24 @@ elif page == "monitoring":
 
     st.title(f"📊 Monitoring ({server})")
 
+    if server == "mac-host":
+        job = "mac-host"
+        instance = "mac-host:9100"   # ✅ FIXED
+    else:
+        job = "docker-server"
+        instance = "node-exporter:9100"
+
     grafana_url = (
-        f"http://localhost:3000/d/rYdddlPWk"
-        f"?refresh=5s&kiosk"
+        f"http://localhost:3000/d/rYdddlPWk/node-exporter-full"
+        f"?orgId=1"
+        f"&var-job={job}"
+        f"&var-instance={instance}"
+        f"&theme=dark"
+        f"&kiosk"
+        f"&refresh=5s"
     )
 
-    st.components.v1.iframe(grafana_url, height=900)
-
+    st.components.v1.iframe(grafana_url, height=1400, scrolling=True)
 
 # -----------------------------
 # FORECAST
@@ -225,7 +233,6 @@ elif page == "forecast":
 
     st.line_chart(df)
 
-
 # -----------------------------
 # ALERTS
 # -----------------------------
@@ -245,7 +252,6 @@ elif page == "alerts":
         st.error("⚠ RAM High")
     else:
         st.success("✅ RAM Normal")
-
 
 # -----------------------------
 # ABOUT
@@ -293,7 +299,6 @@ To help system administrators:
 
 💡 Built as a full-stack AI-powered monitoring system.
 """)
-
 
 # -----------------------------
 # FALLBACK

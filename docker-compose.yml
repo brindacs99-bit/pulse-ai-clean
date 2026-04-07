@@ -9,7 +9,6 @@ services:
       - "3002:3000"
     restart: unless-stopped
 
-  # ✅ ONLY ONE DOCKER SERVER
   node-exporter:
     image: prom/node-exporter:latest
     container_name: pulse-node-exporter
@@ -17,7 +16,6 @@ services:
     ports:
       - "9101:9100"
 
-  # ✅ TEST SERVER (FAKE)
   node-exporter-test:
     image: prom/node-exporter:latest
     container_name: pulse-node-exporter-test
@@ -35,19 +33,35 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
+    extra_hosts:
+      - "mac-host:host-gateway"   # ✅ FIXED
+
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+
   grafana:
     image: grafana/grafana:latest
     container_name: pulse-grafana
     restart: unless-stopped
     ports:
       - "3000:3000"
+
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: Pulse@123
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+
       GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_SECURITY_COOKIE_SAMESITE: none
+      GF_SECURITY_COOKIE_SECURE: "false"
+
+    extra_hosts:
+      - "mac-host:host-gateway"
+
     volumes:
       - grafana_data:/var/lib/grafana
 
@@ -61,6 +75,10 @@ services:
       - "8501:8501"
     volumes:
       - ./app.py:/app/app.py
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
     command: streamlit run app.py --server.address 0.0.0.0 --server.port 8501
 
 volumes:

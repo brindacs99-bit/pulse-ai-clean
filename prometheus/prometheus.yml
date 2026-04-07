@@ -1,11 +1,13 @@
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
 scrape_configs:
-
-  - job_name: "mac-host"
+  - job_name: 'mac-host'
     static_configs:
-      - targets: ["host.docker.internal:9100"]
+      - targets: ['mac-host:9100']
+        labels:
+          instance: ''
 
   - job_name: "docker-server"
     static_configs:
@@ -13,4 +15,4 @@ scrape_configs:
 
   - job_name: "test-server"
     static_configs:
-      - targets: ["node-exporter2:9100"]
+      - targets: ["node-exporter-test:9100"]
